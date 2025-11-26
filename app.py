@@ -20,32 +20,52 @@ def baixar_pdf_do_drive(file_id, caminho_destino):
         with open(caminho_destino, 'wb') as f:
             for chunk in response.iter_content(chunk_size=8192):
                 f.write(chunk)
-        print(f"PDF baixado com sucesso: {caminho_destino}")
+        print(f"PDF baixado: {caminho_destino}")
         return True
     except Exception as e:
         print(f"Erro ao baixar PDF: {e}")
         return False
 
 def inicializar_templates():
-    print("Inicializando templates...")
+    print("=== INICIALIZANDO TEMPLATES ===")
     os.makedirs("templates", exist_ok=True)
+    
     if not os.path.exists(TEMPLATE_FEMININO):
+        print(f"PDF feminino nao encontrado, baixando...")
         baixar_pdf_do_drive(DRIVE_ID_FEMININO, TEMPLATE_FEMININO)
+    else:
+        print(f"PDF feminino ja existe: {TEMPLATE_FEMININO}")
+    
     if not os.path.exists(TEMPLATE_MASCULINO):
+        print(f"PDF masculino nao encontrado, baixando...")
         baixar_pdf_do_drive(DRIVE_ID_MASCULINO, TEMPLATE_MASCULINO)
-    return os.path.exists(TEMPLATE_FEMININO) and os.path.exists(TEMPLATE_MASCULINO)
+    else:
+        print(f"PDF masculino ja existe: {TEMPLATE_MASCULINO}")
+    
+    if os.path.exists(TEMPLATE_FEMININO) and os.path.exists(TEMPLATE_MASCULINO):
+        print("=== TEMPLATES PRONTOS ===")
+        return True
+    else:
+        print("=== ERRO: Templates nao encontrados ===")
+        return False
 
 def hex_to_rgb(hex_color):
     hex_color = hex_color.lstrip('#')
     return tuple(int(hex_color[i:i+2], 16) / 255.0 for i in (0, 2, 4))
 
+# Inicializar templates quando o módulo for importado
+print("Iniciando aplicacao Flask...")
+inicializar_templates()
+
 @app.route('/')
 def home():
+    templates_ok = os.path.exists(TEMPLATE_FEMININO) and os.path.exists(TEMPLATE_MASCULINO)
     return jsonify({
         "status": "online",
         "servico": "Gerador de PDF - Plano Nutricional",
         "endpoint": "/gerar-pdf",
-        "metodo": "POST"
+        "metodo": "POST",
+        "templates_disponiveis": templates_ok
     })
 
 @app.route('/gerar-pdf', methods=['POST'])
@@ -68,8 +88,13 @@ def gerar_pdf():
         else:
             return jsonify({"erro": f"Sexo invalido: '{dados['SEXO']}'"}), 400
 
+        print(f"Verificando template: {arquivo_template}")
+        print(f"Arquivo existe: {os.path.exists(arquivo_template)}")
+        
         if not os.path.exists(arquivo_template):
-            return jsonify({"erro": "Template nao encontrado"}), 500
+            print(f"ERRO: Template nao encontrado em {arquivo_template}")
+            print(f"Arquivos em templates/: {os.listdir('templates') if os.path.exists('templates') else 'pasta nao existe'}")
+            return jsonify({"erro": "Template nao encontrado", "caminho": arquivo_template}), 500
 
         doc = fitz.open(arquivo_template)
         page = doc[0]
@@ -110,13 +135,16 @@ def gerar_pdf():
         pdf_bytes.seek(0)
 
         nome_arquivo = f"PLANO_{dados['ID']}_{dados['NOME'].replace(' ', '_')}.pdf"
+        print(f"PDF gerado com sucesso: {nome_arquivo}")
+        
         return send_file(pdf_bytes, mimetype='application/pdf', as_attachment=True, download_name=nome_arquivo)
 
     except Exception as e:
         print(f"Erro: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({"erro": str(e)}), 500
 
 if __name__ == '__main__':
-    inicializar_templates()
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
