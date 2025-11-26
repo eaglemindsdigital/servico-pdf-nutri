@@ -1,5 +1,0 @@
-[phases.setup]
-nixPkgs = ["python39", "mupdf", "freetype", "harfbuzz", "openjpeg", "jbig2dec", "libjpeg_turbo"]
-
-[phases.install]
-cmds = ["pip install --upgrade pip", "pip install -r requirements.txt"]
