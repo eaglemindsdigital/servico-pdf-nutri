@@ -87,6 +87,20 @@ def gerar_pdf():
         # ===== ESCOLHER TEMPLATE BASEADO NO SEXO =====
         sexo = dados["SEXO"].strip().upper()
         
+        # ===== DEBUG - Listar arquivos =====
+        print("=== DEBUG: Verificando arquivos ===")
+        print(f"Diretório atual: {os.getcwd()}")
+        print(f"Conteúdo do diretório atual: {os.listdir('.')}")
+        print(f"Existe pasta templates/? {os.path.exists('templates')}")
+        if os.path.exists('templates'):
+            print(f"Arquivos em templates/: {os.listdir('templates')}")
+        else:
+            print("⚠️ PASTA TEMPLATES NÃO ENCONTRADA!")
+        print(f"Sexo recebido: '{sexo}'")
+        print(f"Template feminino esperado: {TEMPLATE_FEMININO}")
+        print(f"Template masculino esperado: {TEMPLATE_MASCULINO}")
+        print("=" * 50)
+        
         if sexo in ["FEMININO", "F", "MULHER", "FEMALE"]:
             arquivo_template = TEMPLATE_FEMININO
             tipo_template = "feminino"
@@ -99,10 +113,15 @@ def gerar_pdf():
             }), 400
 
         # Verificar se template existe
+        print(f"Tentando abrir: {arquivo_template}")
+        print(f"Arquivo existe? {os.path.exists(arquivo_template)}")
+        
         if not os.path.exists(arquivo_template):
             return jsonify({
                 "erro": f"Template {tipo_template} não encontrado no servidor",
-                "caminho_esperado": arquivo_template
+                "caminho_esperado": arquivo_template,
+                "diretorio_atual": os.getcwd(),
+                "arquivos_disponiveis": os.listdir('templates') if os.path.exists('templates') else []
             }), 500
 
         # Abrir o PDF template escolhido
@@ -179,6 +198,8 @@ def gerar_pdf():
         # Retornar o PDF
         nome_arquivo = f"PLANO_{dados['ID']}_{dados['NOME'].replace(' ', '_')}.pdf"
         
+        print(f"✅ PDF gerado com sucesso: {nome_arquivo}")
+        
         return send_file(
             pdf_bytes,
             mimetype='application/pdf',
@@ -187,6 +208,9 @@ def gerar_pdf():
         )
 
     except Exception as e:
+        print(f"❌ ERRO: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({"erro": str(e)}), 500
 
 if __name__ == '__main__':
