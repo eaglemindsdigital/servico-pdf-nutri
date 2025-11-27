@@ -112,7 +112,7 @@ def gerar_pdf():
         except:
             imc_formatado = "N/A"
 
-        page.insert_text((1125, 550), dados["NOME"], fontsize=120, fontname="Helvetica-Bold", color=COR_BEGE)
+        page.insert_text((1075, 550), dados["NOME"], fontsize=120, fontname="Helvetica-Bold", color=COR_BEGE)
         page.insert_text((630, 1660), dados["NOMECOMPLETO"], fontsize=64, fontname="Helvetica-Bold", color=COR_PRETO)
         page.insert_text((1530, 1790), dados["ID"], fontsize=64, fontname="Helvetica-Bold", color=COR_PRETO)
         page.insert_text((1950, 1790), dados["PRAZO"], fontsize=64, fontname="Helvetica-Bold", color=COR_PRETO)
@@ -127,7 +127,7 @@ def gerar_pdf():
         page.insert_text((1160, 6085), "4", fontsize=64, fontname="Helvetica-Bold", color=COR_PRETO)
         page.insert_text((550, 13550), f"{dados['PESO']}kg", fontsize=100, fontname="Helvetica-Bold", color=COR_AZUL)
         page.insert_text((1850, 13550), f"{dados['PESO9DIAS']}kg", fontsize=100, fontname="Helvetica-Bold", color=COR_BRANCO)
-        page.insert_text((1125, 32150), dados["NOME"], fontsize=80, fontname="Helvetica-Bold", color=COR_BEGE)
+        page.insert_text((1075, 32150), dados["NOME"], fontsize=80, fontname="Helvetica-Bold", color=COR_BEGE)
 
         pdf_bytes = BytesIO()
         doc.save(pdf_bytes)
