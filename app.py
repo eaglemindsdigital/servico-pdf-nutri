@@ -124,7 +124,7 @@ def gerar_pdf():
         page.insert_text((1550, 2505), imc_formatado, fontsize=64, fontname="Helvetica-Bold", color=COR_PRETO)
         page.insert_text((1070, 2620), dados["NAF"], fontsize=64, fontname="Helvetica-Bold", color=COR_PRETO)
         page.insert_text((920, 6085), dados["META KG"], fontsize=64, fontname="Helvetica-Bold", color=COR_PRETO)
-        page.insert_text((1110, 6085), "4", fontsize=64, fontname="Helvetica-Bold", color=COR_PRETO)
+        page.insert_text((1160, 6085), "4", fontsize=64, fontname="Helvetica-Bold", color=COR_PRETO)
         page.insert_text((550, 13550), f"{dados['PESO']}kg", fontsize=100, fontname="Helvetica-Bold", color=COR_AZUL)
         page.insert_text((1850, 13550), f"{dados['PESO9DIAS']}kg", fontsize=100, fontname="Helvetica-Bold", color=COR_BRANCO)
         page.insert_text((1125, 32150), dados["NOME"], fontsize=80, fontname="Helvetica-Bold", color=COR_BEGE)
